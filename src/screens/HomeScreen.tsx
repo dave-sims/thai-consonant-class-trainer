@@ -15,7 +15,6 @@ import {
     setAccessToken,
     clearAccessToken,
 } from '../../redux';
-import { acc } from 'react-native-reanimated';
 
 type HomeScreenNavigationProp = StackNavigationProp<
     RootStackParamList,
