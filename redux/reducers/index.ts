@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
+import { authReducer } from './auth.reducer';
 import { commonReducer } from './common.reducer';
-//import { storiesReducer } from './stories.reducer'
 
 export const rootReducer = combineReducers({
     common: commonReducer,
-    //stories: storiesReducer
+    auth: authReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

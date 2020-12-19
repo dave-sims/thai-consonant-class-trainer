@@ -4,18 +4,18 @@ import {
     View,
     Text,
     Button,
+    Alert,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App'
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/reducers';
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-
+import Auth0 from 'react-native-auth0';
 import {
-    increment,
-    decrement,
-    incrementWithPayload
+    setAccessToken,
+    clearAccessToken,
 } from '../../redux';
+import { acc } from 'react-native-reanimated';
 
 type HomeScreenNavigationProp = StackNavigationProp<
     RootStackParamList,
@@ -26,58 +26,82 @@ type Props = {
     navigation: HomeScreenNavigationProp;
 };
 
+const auth0 = new Auth0({
+    domain: 'dev-qj1z141z.us.auth0.com',
+    clientId: 'V1f133zB0pJ0E7hxz2g5wNwdq81zSJ9p',
+});
+
 function HomeScreen({ navigation }: Props) {
 
     const dispatch = useDispatch();
-    const { ourNumber } = useSelector((state: RootState) => state.common)
+    const { accessToken } = useSelector((state: RootState) => state.auth)
+
+    const loginAuth0 = () => {
+        auth0
+            .webAuth
+            .authorize({ scope: 'openid profile email' }, { ephemeralSession: true })
+            .then(credentials => {
+                // authenticated, store the accessToken
+                console.log(credentials.accessToken);
+                dispatch(setAccessToken(credentials.accessToken))
+                console.log(credentials);
+                auth0.auth
+                    .userInfo({ token: credentials.accessToken })
+                    .then(console.log)
+                    .catch(console.error)
+            })
+            .catch(error => console.log(error));
+    }
+
+    const logoutAuth0 = () => {
+        auth0.webAuth
+            .clearSession(undefined)
+            .then(success => {
+                Alert.alert(
+                    'Logged out!'
+                );
+                // logged out, clear access token
+                dispatch(clearAccessToken());
+            })
+            .catch(error => {
+                console.log('Log out cancelled');
+            });
+    }
 
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>Home Screen {ourNumber}</Text>
-            <Button
-                title="Go to About"
-                onPress={() => navigation.navigate('About')}
-            />
-            <Button
-                title="Go to Settings"
-                onPress={() => navigation.navigate('Settings')}
-            />
-            <Button
-                title="Increment the number"
-                onPress={() => dispatch(increment())}
-            />
-            <Button
-                title="Decrement the number"
-                onPress={() => dispatch(decrement())}
-            />
-            <Button
-                title="Add 5 to the number"
-                onPress={() => dispatch(incrementWithPayload(5))}
-            />
-            <Button
-                title="login"
-                onPress={() => login()}
-            />
-
+            <Text>Home Screen</Text>
+            { accessToken ? <Text>{accessToken}</Text> : null}
+            <View style={styles.buttonStyle}>
+                <Button
+                    title="Go to About"
+                    onPress={() => navigation.navigate('About')}
+                /></View>
+            <View style={styles.buttonStyle}>
+                <Button
+                    title="Go to Settings"
+                    onPress={() => navigation.navigate('Settings')}
+                /></View>
+            <View style={styles.buttonStyle}>
+                <Button
+                    title="Login"
+                    onPress={() => loginAuth0()}
+                />
+            </View>
+            <View style={styles.buttonStyle}>
+                <Button
+                    title="Logout"
+                    onPress={() => logoutAuth0()}
+                />
+            </View>
         </View>
     );
 }
 
-const login = () => {
-    console.log('login')
-    auth()
-        .signInAnonymously()
-        .then(() => {
-            console.log('User signed in anonymously');
-        })
-        .catch(error => {
-            if (error.code === 'auth/operation-not-allowed') {
-                console.log('Enable anonymous in your firebase console.');
-            }
-            console.error(error);
-        });
-}
-
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    buttonStyle: {
+        marginVertical: 10
+    }
+});
 
 export default HomeScreen;
