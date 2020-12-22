@@ -73,6 +73,11 @@ function HomeScreen({ navigation }: Props) {
             { accessToken ? <Text>{accessToken}</Text> : null}
             <View style={styles.buttonStyle}>
                 <Button
+                    title="Class Trainer"
+                    onPress={() => navigation.navigate('ClassTrainer')}
+                /></View>
+            <View style={styles.buttonStyle}>
+                <Button
                     title="Go to About"
                     onPress={() => navigation.navigate('About')}
                 /></View>

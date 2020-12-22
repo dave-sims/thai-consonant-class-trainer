@@ -18,6 +18,7 @@ import { PersistGate } from 'redux-persist/es/integration/react';
 import HomeScreen from './src/screens/HomeScreen';
 import AboutScreen from './src/screens/AboutScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import ClassTrainerScreen from './src/screens/ClassTrainerScreen';
 
 declare const global: { HermesInternal: null | {} };
 
@@ -25,6 +26,7 @@ export type RootStackParamList = {
   Home: undefined;
   About: undefined;
   Settings: undefined;
+  ClassTrainer: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -50,6 +52,7 @@ const App = () => {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="About" component={AboutScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="ClassTrainer" component={ClassTrainerScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </PersistGate>
